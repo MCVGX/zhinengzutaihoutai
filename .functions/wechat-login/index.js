@@ -13,7 +13,7 @@ const db = app.database();
 function generateUserId(openid) {
   const timestamp = Date.now();
   const hash = openid ? openid.substring(0, 8) : Math.random().toString(36).substring(2, 10);
-  return `user_${timestamp}_${hash}`;
+  return 'user_' + timestamp + '_' + hash;
 }
 
 /**
@@ -34,7 +34,7 @@ async function getOrCreateUser(openId, appId, extraData) {
       existingUser = result.data[0];
     }
   } catch (e) {
-    console.log('查询用户失败，可能表不存在或权限问题', e.message);
+    console.log('查询用户失败', e.message);
   }
   
   if (existingUser) {
@@ -43,7 +43,6 @@ async function getOrCreateUser(openId, appId, extraData) {
       updatedAt: new Date()
     };
     
-    // 如果提供了昵称和头像，也更新这些信息
     if (extraData.nickname) {
       updateData.nickname = extraData.nickname;
     }
@@ -52,9 +51,7 @@ async function getOrCreateUser(openId, appId, extraData) {
     }
     
     try {
-      await collection
-        .doc(existingUser._id)
-        .update(updateData);
+      await collection.doc(existingUser._id).update(updateData);
     } catch (e) {
       console.log('更新用户失败', e.message);
     }
@@ -70,7 +67,7 @@ async function getOrCreateUser(openId, appId, extraData) {
     // 创建新用户
     const userId = generateUserId(openId);
     const newUser = {
-      userId,
+      userId: userId,
       openid: openId || '',
       appId: appId || '',
       nickname: extraData.nickname || '',
@@ -93,7 +90,6 @@ async function getOrCreateUser(openId, appId, extraData) {
       };
     } catch (e) {
       console.log('创建用户失败', e.message);
-      // 如果创建失败，返回临时用户信息
       return {
         userId: userId,
         openid: openId || '',
@@ -112,16 +108,16 @@ async function getOrCreateUser(openId, appId, extraData) {
 async function main(event, context) {
   try {
     // 获取微信用户信息
-    // 在云函数中，需要通过微信服务器获取 openid
-    // 这里从 event 中接收客户端传来的用户信息
-    const { nickname, avatar } = event.data || {};
+    const eventData = event.data || {};
+    const nickname = eventData.nickname;
+    const avatar = eventData.avatar;
     
     // 获取调用者的 openid（云函数自动获取）
     const wxContext = event.WX_CONTEXT || {};
     const openId = wxContext.OPENID || '';
     const appId = wxContext.APPID || '';
     
-    console.log('登录信息:', { openId, appId, nickname, avatar });
+    console.log('登录信息:', openId, appId);
     
     // 如果没有 openid，返回错误
     if (!openId) {
@@ -131,7 +127,7 @@ async function main(event, context) {
         openid: '',
         loginStatus: 'failed',
         isNewUser: false,
-        error: '无法获取用户OpenID，请确保在小程序中调用'
+        error: '无法获取用户OpenID'
       };
     }
     
@@ -164,4 +160,4 @@ async function main(event, context) {
   }
 }
 
-module.exports = { main };
+module.exports = main;
