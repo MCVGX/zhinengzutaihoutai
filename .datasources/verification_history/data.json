@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "1",
+    "serial_number": "DEV-2026-001",
+    "result": "success",
+    "user": "张三",
+    "createdAt": 1746520200000,
+    "updatedAt": 1746520200000,
+    "time": "2026-05-05 14:30",
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "2",
+    "serial_number": "DEV-2026-002",
+    "result": "failed",
+    "user": "李四",
+    "createdAt": 1746516600000,
+    "updatedAt": 1746516600000,
+    "time": "2026-05-05 13:20",
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "3",
+    "serial_number": "DEV-2026-003",
+    "result": "success",
+    "user": "王五",
+    "createdAt": 1746449100000,
+    "updatedAt": 1746449100000,
+    "time": "2026-05-04 16:45",
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "4",
+    "serial_number": "DEV-2026-001",
+    "result": "success",
+    "user": "张三",
+    "createdAt": 1746416100000,
+    "updatedAt": 1746416100000,
+    "time": "2026-05-04 10:15",
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  }
+]

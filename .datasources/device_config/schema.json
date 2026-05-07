@@ -1,0 +1,81 @@
+{
+  "title": "设备配置表",
+  "fields": [
+    {
+      "name": "serial_number",
+      "type": "string",
+      "required": true,
+      "description": "设备序列号"
+    },
+    {
+      "name": "file_name",
+      "type": "string",
+      "required": true,
+      "description": "文件名"
+    },
+    {
+      "name": "file_type",
+      "type": "string",
+      "required": true,
+      "description": "文件类型：db或json"
+    },
+    {
+      "name": "file_hash",
+      "type": "string",
+      "required": true,
+      "description": "文件哈希值（SHA256），用于文件唯一标识和匹配"
+    },
+    {
+      "name": "file_size",
+      "type": "number",
+      "required": true,
+      "description": "文件大小（字节）"
+    },
+    {
+      "name": "file_content",
+      "type": "text",
+      "required": true,
+      "description": "文件内容"
+    },
+    {
+      "name": "upload_time",
+      "type": "datetime",
+      "required": true,
+      "description": "上传时间"
+    },
+    {
+      "name": "upload_user_id",
+      "type": "string",
+      "required": true,
+      "description": "上传用户ID"
+    },
+    {
+      "name": "version",
+      "type": "number",
+      "required": true,
+      "description": "版本号"
+    },
+    {
+      "name": "is_latest",
+      "type": "boolean",
+      "required": true,
+      "default": true,
+      "description": "是否为最新版本"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["serial_number", "file_type", "is_latest"]
+    },
+    {
+      "fields": ["file_hash"],
+      "unique": true
+    },
+    {
+      "fields": ["serial_number"]
+    },
+    {
+      "fields": ["upload_time"]
+    }
+  ]
+}

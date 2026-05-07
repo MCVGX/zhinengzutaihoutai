@@ -1,0 +1,42 @@
+{
+  "title": "设备绑定关系",
+  "fields": [
+    {
+      "name": "serial_number",
+      "type": "string",
+      "required": true,
+      "description": "设备序列号"
+    },
+    {
+      "name": "user_id",
+      "type": "string",
+      "required": true,
+      "description": "用户ID"
+    },
+    {
+      "name": "bind_time",
+      "type": "datetime",
+      "required": true,
+      "description": "绑定时间"
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "required": true,
+      "default": true,
+      "description": "是否激活"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["serial_number", "user_id"],
+      "unique": true
+    },
+    {
+      "fields": ["serial_number"]
+    },
+    {
+      "fields": ["user_id"]
+    }
+  ]
+}

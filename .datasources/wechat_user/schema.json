@@ -1,0 +1,35 @@
+{
+  "name": "wechat_user",
+  "title": "用户表",
+  "schemas": [
+    {
+      "name": "openid",
+      "title": "微信OpenID",
+      "type": "String"
+    },
+    {
+      "name": "nickname",
+      "title": "用户昵称",
+      "type": "String"
+    },
+    {
+      "name": "avatar",
+      "title": "头像URL",
+      "type": "String"
+    },
+    {
+      "name": "devices",
+      "title": "绑定设备列表",
+      "type": "Array",
+      "items": {
+        "type": "String"
+      }
+    },
+    {
+      "name": "created_at",
+      "title": "创建时间",
+      "type": "DateTime",
+      "format": "string"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "verification_history",
+  "title": "验证历史表",
+  "schemas": [
+    {
+      "name": "serial_number",
+      "title": "设备序列号",
+      "type": "String"
+    },
+    {
+      "name": "result",
+      "title": "验证结果",
+      "type": "String"
+    },
+    {
+      "name": "user",
+      "title": "验证用户",
+      "type": "String"
+    },
+    {
+      "name": "time",
+      "title": "验证时间",
+      "type": "DateTime",
+      "format": "string"
+    }
+  ]
+}

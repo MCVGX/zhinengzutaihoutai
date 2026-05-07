@@ -1,0 +1,64 @@
+{
+  "title": "上传历史记录",
+  "fields": [
+    {
+      "name": "serial_number",
+      "type": "string",
+      "required": true,
+      "description": "设备序列号"
+    },
+    {
+      "name": "user_id",
+      "type": "string",
+      "required": true,
+      "description": "用户ID"
+    },
+    {
+      "name": "file_type",
+      "type": "string",
+      "required": true,
+      "description": "文件类型：db或json"
+    },
+    {
+      "name": "operation",
+      "type": "string",
+      "required": true,
+      "description": "操作类型：upload或sync"
+    },
+    {
+      "name": "upload_time",
+      "type": "datetime",
+      "required": true,
+      "description": "上传时间"
+    },
+    {
+      "name": "version",
+      "type": "number",
+      "required": true,
+      "description": "版本号"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": true,
+      "description": "状态：success或failed"
+    },
+    {
+      "name": "error_message",
+      "type": "string",
+      "required": false,
+      "description": "错误信息"
+    }
+  ],
+  "indexes": [
+    {
+      "fields": ["serial_number", "upload_time"]
+    },
+    {
+      "fields": ["user_id", "upload_time"]
+    },
+    {
+      "fields": ["upload_time"]
+    }
+  ]
+}

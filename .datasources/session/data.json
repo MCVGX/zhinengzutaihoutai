@@ -1,0 +1,67 @@
+[
+  {
+    "_id": "1",
+    "session_id": "sess_20260506_001",
+    "user_id": "user_001",
+    "login_time": "2026-05-06T08:30:00Z",
+    "expire_time": "2026-05-06T10:30:00Z",
+    "createdAt": 1715034000000,
+    "updatedAt": 1715034000000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system",
+    "login_source": "wechat"
+  },
+  {
+    "_id": "2",
+    "session_id": "sess_20260506_002",
+    "user_id": "user_002",
+    "login_time": "2026-05-06T09:15:00Z",
+    "expire_time": "2026-05-06T11:15:00Z",
+    "createdAt": 1715037300000,
+    "updatedAt": 1715037300000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system",
+    "login_source": "pc"
+  },
+  {
+    "_id": "3",
+    "session_id": "sess_20260506_003",
+    "user_id": "user_003",
+    "login_time": "2026-05-06T10:00:00Z",
+    "expire_time": "2026-05-06T12:00:00Z",
+    "createdAt": 1715040000000,
+    "updatedAt": 1715040000000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system",
+    "login_source": "wechat"
+  },
+  {
+    "_id": "4",
+    "session_id": "sess_20260505_001",
+    "user_id": "user_004",
+    "login_time": "2026-05-05T14:20:00Z",
+    "expire_time": "2026-05-05T16:20:00Z",
+    "createdAt": 1714948800000,
+    "updatedAt": 1714948800000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system",
+    "login_source": "pc"
+  },
+  {
+    "_id": "5",
+    "session_id": "sess_20260505_002",
+    "user_id": "user_001",
+    "login_time": "2026-05-05T16:45:00Z",
+    "expire_time": "2026-05-05T18:45:00Z",
+    "createdAt": 1714956300000,
+    "updatedAt": 1714956300000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system",
+    "login_source": "wechat"
+  }
+]

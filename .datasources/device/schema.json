@@ -1,0 +1,37 @@
+{
+  "name": "device",
+  "title": "设备表",
+  "schemas": [
+    {
+      "name": "serial_number",
+      "title": "设备序列号",
+      "type": "String"
+    },
+    {
+      "name": "name",
+      "title": "设备名称",
+      "type": "String"
+    },
+    {
+      "name": "status",
+      "title": "状态",
+      "type": "String"
+    },
+    {
+      "name": "bind_user",
+      "title": "绑定用户",
+      "type": "String"
+    },
+    {
+      "name": "user_id",
+      "title": "用户ID",
+      "type": "String"
+    },
+    {
+      "name": "created_at",
+      "title": "创建时间",
+      "type": "DateTime",
+      "format": "string"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "wechat-login",
+  "version": "1.0.0",
+  "description": "微信登录接口",
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.3.7"
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "serial_number": "SN001",
+    "user_id": "user123",
+    "bind_time": "2024-01-01T00:00:00Z",
+    "is_active": true
+  },
+  {
+    "serial_number": "SN002",
+    "user_id": "user456",
+    "bind_time": "2024-01-02T00:00:00Z",
+    "is_active": true
+  }
+]

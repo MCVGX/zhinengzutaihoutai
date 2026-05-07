@@ -1,0 +1,66 @@
+{
+  "name": "users",
+  "description": "用户信息表",
+  "fields": [
+    {
+      "name": "userId",
+      "type": "string",
+      "description": "用户唯一ID",
+      "required": true
+    },
+    {
+      "name": "openid",
+      "type": "string",
+      "description": "微信openid",
+      "required": true
+    },
+    {
+      "name": "appId",
+      "type": "string",
+      "description": "微信appId",
+      "required": false
+    },
+    {
+      "name": "unionId",
+      "type": "string",
+      "description": "微信unionId",
+      "required": false
+    },
+    {
+      "name": "nickname",
+      "type": "string",
+      "description": "用户昵称",
+      "required": false
+    },
+    {
+      "name": "avatar",
+      "type": "string",
+      "description": "用户头像",
+      "required": false
+    },
+    {
+      "name": "createdAt",
+      "type": "datetime",
+      "description": "创建时间",
+      "required": false
+    },
+    {
+      "name": "lastLoginAt",
+      "type": "datetime",
+      "description": "最后登录时间",
+      "required": false
+    }
+  ],
+  "indexes": [
+    {
+      "name": "openid_idx",
+      "fields": ["openid"],
+      "unique": true
+    },
+    {
+      "name": "userId_idx",
+      "fields": ["userId"],
+      "unique": true
+    }
+  ]
+}

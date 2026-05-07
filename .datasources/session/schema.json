@@ -1,0 +1,33 @@
+{
+  "name": "session",
+  "title": "会话管理表",
+  "schemas": [
+    {
+      "name": "session_id",
+      "title": "会话ID",
+      "type": "String"
+    },
+    {
+      "name": "user_id",
+      "title": "用户ID",
+      "type": "String"
+    },
+    {
+      "name": "login_time",
+      "title": "登录时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "expire_time",
+      "title": "过期时间",
+      "type": "DateTime",
+      "format": "string"
+    },
+    {
+      "name": "login_source",
+      "title": "登录来源",
+      "type": "String"
+    }
+  ]
+}

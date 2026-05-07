@@ -1,0 +1,42 @@
+{
+  "name": "config_file",
+  "title": "配置表",
+  "schemas": [
+    {
+      "name": "filename",
+      "title": "文件名",
+      "type": "String"
+    },
+    {
+      "name": "type",
+      "title": "文件类型",
+      "type": "String"
+    },
+    {
+      "name": "size",
+      "title": "文件大小",
+      "type": "String"
+    },
+    {
+      "name": "device_serial_number",
+      "title": "关联设备序列号",
+      "type": "String"
+    },
+    {
+      "name": "file_content",
+      "title": "文件内容",
+      "type": "String"
+    },
+    {
+      "name": "upload_user",
+      "title": "上传用户",
+      "type": "String"
+    },
+    {
+      "name": "upload_time",
+      "title": "上传时间",
+      "type": "DateTime",
+      "format": "string"
+    }
+  ]
+}
