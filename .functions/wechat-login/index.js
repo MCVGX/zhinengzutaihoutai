@@ -23,11 +23,11 @@ async function getOrCreateUser(openId, appId, extraData) {
   // 使用 wechat_user 表
   const collection = db.collection('wechat_user');
   
-  // 查询是否已存在该用户
+  // 查询是否已存在该用户（使用 _openid 系统字段）
   let existingUser = null;
   try {
     const result = await collection
-      .where({ openid: openId })
+      .where({ _openid: openId })
       .get();
     
     if (result.data && result.data.length > 0) {
@@ -64,9 +64,10 @@ async function getOrCreateUser(openId, appId, extraData) {
       avatar: existingUser.avatar || extraData.avatar || ''
     };
   } else {
-    // 创建新用户
+    // 创建新用户（必须包含 _openid 字段）
     const userId = generateUserId(openId);
     const newUser = {
+      _openid: openId,
       userId: userId,
       openid: openId || '',
       appId: appId || '',
