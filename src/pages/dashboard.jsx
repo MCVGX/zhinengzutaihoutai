@@ -81,7 +81,9 @@ function Sidebar({
 }
 
 // 设备序列号管理页面
-function DeviceManagement() {
+function DeviceManagement({
+  $w
+}) {
   const [devices, setDevices] = useState([{
     id: 1,
     serialNumber: 'DEV-2026-001',
@@ -270,7 +272,9 @@ function DeviceManagement() {
 }
 
 // 用户管理页面
-function UserManagement() {
+function UserManagement({
+  $w
+}) {
   const [users] = useState([{
     id: 1,
     openid: 'oXXXX1',
@@ -336,7 +340,9 @@ function UserManagement() {
 }
 
 // 配置表管理页面
-function ConfigManagement() {
+function ConfigManagement({
+  $w
+}) {
   const [configs] = useState([{
     id: 1,
     filename: 'config.json',
@@ -437,45 +443,66 @@ function ConfigManagement() {
 }
 
 // 设备绑定验证页面
-function BindingVerification() {
+function BindingVerification({
+  $w
+}) {
   const [serialNumber, setSerialNumber] = useState('');
   const [verificationResult, setVerificationResult] = useState(null);
-  const [history] = useState([{
-    id: 1,
-    serialNumber: 'DEV-2026-001',
-    result: 'success',
-    user: '张三',
-    time: '2026-05-05 14:30'
-  }, {
-    id: 2,
-    serialNumber: 'DEV-2026-002',
-    result: 'failed',
-    user: '李四',
-    time: '2026-05-05 13:20'
-  }, {
-    id: 3,
-    serialNumber: 'DEV-2026-003',
-    result: 'success',
-    user: '王五',
-    time: '2026-05-04 16:45'
-  }, {
-    id: 4,
-    serialNumber: 'DEV-2026-001',
-    result: 'success',
-    user: '张三',
-    time: '2026-05-04 10:15'
-  }]);
-  const handleVerify = () => {
-    if (!serialNumber.trim()) return;
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    // 模拟验证
-    const isValid = serialNumber.startsWith('DEV-');
-    setVerificationResult({
-      serialNumber,
-      isValid,
-      message: isValid ? '验证成功，该设备序列号有效' : '验证失败，该设备序列号无效',
-      bindUser: isValid ? '张三' : null
-    });
+  // 加载验证历史
+  useEffect(() => {
+    loadHistory();
+  }, []);
+  const loadHistory = async () => {
+    setLoading(true);
+    try {
+      const result = await $w.cloud.callFunction({
+        name: 'get-verification-history',
+        data: {}
+      });
+      if (result && result.list) {
+        setHistory(result.list);
+      }
+    } catch (error) {
+      console.error('加载验证历史失败', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleVerify = async () => {
+    if (!serialNumber.trim()) return;
+    setLoading(true);
+    try {
+      // 调用云函数验证设备序列号
+      const result = await $w.cloud.callFunction({
+        name: 'device-binding',
+        data: {
+          action: 'verify',
+          serialNumber: serialNumber.trim()
+        }
+      });
+      setVerificationResult({
+        serialNumber,
+        isValid: result.success,
+        message: result.message || (result.success ? '验证成功，该设备序列号有效' : '验证失败，该设备序列号无效'),
+        bindUser: result.bindUser || null
+      });
+
+      // 刷新历史记录
+      loadHistory();
+    } catch (error) {
+      console.error('验证失败', error);
+      setVerificationResult({
+        serialNumber,
+        isValid: false,
+        message: '验证请求失败，请稍后重试',
+        bindUser: null
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   const getResultColor = result => {
     return result === 'success' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -535,15 +562,19 @@ function BindingVerification() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700">
-            {history.map(item => <tr key={item.id} className="hover:bg-slate-700/30 transition-colors">
-                <td className="px-6 py-4 font-mono text-cyan-400">{item.serialNumber}</td>
+            {loading && history.length === 0 ? <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-slate-400">加载中...</td>
+              </tr> : history.length === 0 ? <tr>
+                <td colSpan={4} className="px-6 py-8 text-center text-slate-400">暂无验证记录</td>
+              </tr> : history.map((item, index) => <tr key={item._id || index} className="hover:bg-slate-700/30 transition-colors">
+                <td className="px-6 py-4 font-mono text-cyan-400">{item.serial_number}</td>
                 <td className="px-6 py-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getResultColor(item.result)}`}>
                     {item.result === 'success' ? '成功' : '失败'}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-slate-300">{item.user}</td>
-                <td className="px-6 py-4 text-slate-400">{item.time}</td>
+                <td className="px-6 py-4 text-slate-300">{item.user || '-'}</td>
+                <td className="px-6 py-4 text-slate-400">{item.time || '-'}</td>
               </tr>)}
           </tbody>
         </table>
@@ -552,7 +583,9 @@ function BindingVerification() {
 }
 
 // 微信小程序API接入说明页面
-function WechatAPIPage() {
+function WechatAPIPage({
+  $w
+}) {
   const [copiedCode, setCopiedCode] = useState(null);
   const copyToClipboard = (code, id) => {
     navigator.clipboard.writeText(code);
@@ -813,22 +846,23 @@ wx.cloud.callFunction({
 
 // 主页面组件
 export default function Dashboard(props) {
+  const $w = props.$w;
   const [activePage, setActivePage] = useState('devices');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const renderPage = () => {
     switch (activePage) {
       case 'devices':
-        return <DeviceManagement />;
+        return <DeviceManagement $w={$w} />;
       case 'users':
-        return <UserManagement />;
+        return <UserManagement $w={$w} />;
       case 'configs':
-        return <ConfigManagement />;
+        return <ConfigManagement $w={$w} />;
       case 'binding':
-        return <BindingVerification />;
+        return <BindingVerification $w={$w} />;
       case 'wechat-api':
-        return <WechatAPIPage />;
+        return <WechatAPIPage $w={$w} />;
       default:
-        return <DeviceManagement />;
+        return <DeviceManagement $w={$w} />;
     }
   };
   return <div className="min-h-screen bg-slate-950">
