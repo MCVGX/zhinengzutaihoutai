@@ -1,7 +1,9 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Server, Users, FileJson, Link, Menu, X, ChevronRight, Activity, Smartphone, Copy, Check, ExternalLink } from 'lucide-react';
+import { Server, Users, FileJson, Link, Menu, X, ChevronRight, Activity, Smartphone, Copy, Check, ExternalLink, BookOpen } from 'lucide-react';
+// @ts-ignore;
+import { APIDocs } from '@/components/ui';
 
 // 侧边栏组件
 function Sidebar({
@@ -30,6 +32,10 @@ function Sidebar({
     id: 'wechat-api',
     label: '微信小程序API',
     icon: Smartphone
+  }, {
+    id: 'api-docs',
+    label: 'API接口文档',
+    icon: BookOpen
   }];
   return <>
       {/* 移动端遮罩 */}
@@ -861,6 +867,8 @@ export default function Dashboard(props) {
         return <BindingVerification $w={$w} />;
       case 'wechat-api':
         return <WechatAPIPage $w={$w} />;
+      case 'api-docs':
+        return <APIDocs $w={$w} />;
       default:
         return <DeviceManagement $w={$w} />;
     }
