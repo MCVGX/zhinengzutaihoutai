@@ -1,7 +1,7 @@
 // @ts-ignore;
 import React, { useState, useEffect } from 'react';
 // @ts-ignore;
-import { Server, Users, FileJson, Link, Menu, X, ChevronRight, Activity } from 'lucide-react';
+import { Server, Users, FileJson, Link, Menu, X, ChevronRight, Activity, Smartphone, Copy, Check, ExternalLink } from 'lucide-react';
 
 // 侧边栏组件
 function Sidebar({
@@ -26,6 +26,10 @@ function Sidebar({
     id: 'binding',
     label: '设备绑定验证',
     icon: Link
+  }, {
+    id: 'wechat-api',
+    label: '微信小程序API',
+    icon: Smartphone
   }];
   return <>
       {/* 移动端遮罩 */}
@@ -547,6 +551,266 @@ function BindingVerification() {
     </div>;
 }
 
+// 微信小程序API接入说明页面
+function WechatAPIPage() {
+  const [copiedCode, setCopiedCode] = useState(null);
+  const copyToClipboard = (code, id) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(id);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+  const codeExamples = [{
+    id: 'login',
+    title: '微信登录',
+    description: '在微信小程序中调用云函数完成微信登录，获取用户信息并创建/更新用户记录',
+    code: `// 微信小程序中调用云函数进行登录
+const app = getApp();
+
+// 调用微信登录云函数
+wx.cloud.callFunction({
+  name: 'wechat-login',
+  data: {
+    nickname: userInfo.nickName,
+    avatar: userInfo.avatarUrl
+  },
+  success: res => {
+    if (res.result.loginStatus === 'success') {
+      console.log('登录成功', res.result);
+      // 保存用户信息到本地
+      wx.setStorageSync('userInfo', res.result);
+    }
+  },
+  fail: err => {
+    console.error('登录失败', err);
+  }
+});`
+  }, {
+    id: 'userinfo',
+    title: '获取用户信息',
+    description: '使用 wx.getUserProfile 获取微信用户基本信息（昵称、头像等）',
+    code: `// 获取微信用户信息
+wx.getUserProfile({
+  desc: '用于完善用户资料',
+  success: res => {
+    const userInfo = res.userInfo;
+    console.log('用户信息', userInfo);
+    // 可以将用户信息传递给云函数
+  }
+});`
+  }, {
+    id: 'database',
+    title: '数据库操作',
+    description: '在微信小程序中查询、添加、修改云数据库中的数据记录',
+    code: `// 微信小程序中操作云数据库
+const db = wx.cloud.database();
+
+// 查询设备列表
+db.collection('device').where({
+  _openid: '{openid}' // 自动获取当前用户openid
+}).get().then(res => {
+  console.log('设备列表', res.data);
+});
+
+// 添加设备
+db.collection('device').add({
+  data: {
+    serial_number: 'DEV-2026-001',
+    name: '服务器A组',
+    status: 'online',
+    created_at: new Date()
+  }
+}).then(res => {
+  console.log('添加成功', res._id);
+});`
+  }, {
+    id: 'upload',
+    title: '文件上传',
+    description: '选择本地文件（.json/.db）上传到云存储，并保存文件信息到数据库',
+    code: `// 上传配置文件到云存储
+wx.chooseMessageFile({
+  count: 1,
+  type: 'file',
+  extension: ['json', 'db'],
+  success: res => {
+    const filePath = res.tempFiles[0].path;
+    const fileName = res.tempFiles[0].name;
+    
+    // 上传到云存储
+    const cloudPath = 'configs/' + Date.now() + '-' + fileName;
+    
+    wx.cloud.uploadFile({
+      cloudPath: cloudPath,
+      filePath: filePath,
+      success: res => {
+        console.log('上传成功', res.fileID);
+        // 保存文件信息到数据库
+        db.collection('config_file').add({
+          data: {
+            file_name: fileName,
+            file_url: res.fileID,
+            file_type: fileName.endsWith('.json') ? 'json' : 'db',
+            uploaded_by: '{openid}',
+            uploaded_at: new Date()
+          }
+        });
+      }
+    });
+  }
+});`
+  }, {
+    id: 'binding',
+    title: '设备绑定验证',
+    description: '调用云函数进行设备绑定和序列号验证操作',
+    code: `// 设备绑定验证
+wx.cloud.callFunction({
+  name: 'device-binding',
+  data: {
+    action: 'bind',
+    serialNumber: 'DEV-2026-001',
+    userId: '{userId}'
+  },
+  success: res => {
+    if (res.result.success) {
+      wx.showToast({ title: '绑定成功' });
+    }
+  }
+});
+
+// 验证设备序列号
+wx.cloud.callFunction({
+  name: 'device-binding',
+  data: {
+    action: 'verify',
+    serialNumber: 'DEV-2026-001'
+  },
+  success: res => {
+    console.log('验证结果', res.result);
+  }
+});`
+  }];
+  return <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-100 font-mono">微信小程序API接入</h2>
+        <p className="text-slate-400 mt-1">在微信小程序中调用云开发能力的完整示例代码</p>
+      </div>
+
+      {/* 接入前准备 */}
+      <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+            <Smartphone className="w-4 h-4 text-cyan-400" />
+          </div>
+          接入前准备
+        </h3>
+        <div className="space-y-3 text-slate-300">
+          <p>1. <span className="text-cyan-400">开通云开发</span>：在微信开发者工具中点击"云开发"按钮，创建云开发环境</p>
+          <p>2. <span className="text-cyan-400">初始化云能力</span>：在 app.js 中调用 wx.cloud.init()</p>
+          <p>3. <span className="text-cyan-400">安全域名配置</span>：在微信公众平台配置安全域名（request合法域名）</p>
+          <p>4. <span className="text-cyan-400">上传云函数</span>：在云开发控制台上传并部署 wechat-login 等云函数</p>
+        </div>
+        
+        <div className="mt-4 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+          <p className="text-sm text-slate-400 mb-2">初始化代码（app.js）：</p>
+          <pre className="text-sm text-cyan-400 font-mono overflow-x-auto">
+          {`App({ onLaunch() { wx.cloud.init({ env: 'your-env-id' }); } })`}
+          </pre>
+        </div>
+      </div>
+
+      {/* API调用示例 */}
+      <div className="space-y-4">
+        {codeExamples.map(example => <div key={example.id} className="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-100">{example.title}</h3>
+                <p className="text-sm text-slate-400 mt-1">{example.description}</p>
+              </div>
+              <button onClick={() => copyToClipboard(example.code, example.id)} className="p-2 hover:bg-slate-700 rounded-lg transition-colors text-slate-400 hover:text-cyan-400">
+                {copiedCode === example.id ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+              </button>
+            </div>
+            <div className="p-4 bg-slate-950 overflow-x-auto">
+              <pre className="text-sm text-slate-300 font-mono whitespace-pre-wrap">
+                {example.code}
+              </pre>
+            </div>
+          </div>)}
+      </div>
+
+      {/* 云函数列表 */}
+      <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">已部署的云函数</h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <Check className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="font-medium text-slate-100">wechat-login</p>
+                <p className="text-sm text-slate-400">微信用户登录</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 bg-slate-900/50 rounded-lg border border-slate-700 opacity-60">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center">
+                <ExternalLink className="w-5 h-5 text-slate-400" />
+              </div>
+              <div>
+                <p className="font-medium text-slate-300">device-binding</p>
+                <p className="text-sm text-slate-400">设备绑定验证（待部署）</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 数据表说明 */}
+      <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
+        <h3 className="text-lg font-semibold text-slate-100 mb-4">数据表说明</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-900/50">
+              <tr>
+                <th className="px-4 py-3 text-left text-slate-400 font-medium">表名</th>
+                <th className="px-4 py-3 text-left text-slate-400 font-medium">说明</th>
+                <th className="px-4 py-3 text-left text-slate-400 font-medium">主要字段</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700">
+              <tr>
+                <td className="px-4 py-3 text-cyan-400 font-mono">users</td>
+                <td className="px-4 py-3 text-slate-300">用户信息表</td>
+                <td className="px-4 py-3 text-slate-400">userId, openid, nickname, avatar</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-cyan-400 font-mono">device</td>
+                <td className="px-4 py-3 text-slate-300">设备表</td>
+                <td className="px-4 py-3 text-slate-400">serial_number, name, status, bind_user</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-cyan-400 font-mono">device_binding</td>
+                <td className="px-4 py-3 text-slate-300">设备绑定关系</td>
+                <td className="px-4 py-3 text-slate-400">device_id, user_id, bound_at</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-cyan-400 font-mono">config_file</td>
+                <td className="px-4 py-3 text-slate-300">配置表</td>
+                <td className="px-4 py-3 text-slate-400">file_name, file_url, file_type, version</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 text-cyan-400 font-mono">verification_history</td>
+                <td className="px-4 py-3 text-slate-300">验证历史</td>
+                <td className="px-4 py-3 text-slate-400">serial_number, result, user_id, verified_at</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>;
+}
+
 // 主页面组件
 export default function Dashboard(props) {
   const [activePage, setActivePage] = useState('devices');
@@ -561,6 +825,8 @@ export default function Dashboard(props) {
         return <ConfigManagement />;
       case 'binding':
         return <BindingVerification />;
+      case 'wechat-api':
+        return <WechatAPIPage />;
       default:
         return <DeviceManagement />;
     }
