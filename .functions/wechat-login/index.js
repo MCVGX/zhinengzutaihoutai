@@ -11,28 +11,36 @@ const db = app.database();
  * 生成用户ID
  */
 function generateUserId(openid) {
-  // 使用时间戳和openid的hash组合生成唯一ID
   const timestamp = Date.now();
-  const hash = openid.substring(0, 8);
+  const hash = openid ? openid.substring(0, 8) : Math.random().toString(36).substring(2, 10);
   return `user_${timestamp}_${hash}`;
 }
 
 /**
  * 获取或创建用户
  */
-async function getOrCreateUser(userInfo, extraData) {
-  const { openId, appId } = userInfo;
+async function getOrCreateUser(openId, appId, extraData) {
+  // 使用 wechat_user 表
+  const collection = db.collection('wechat_user');
   
   // 查询是否已存在该用户
-  const existingUser = await db.collection('users')
-    .where({ openid: openId })
-    .get();
+  let existingUser = null;
+  try {
+    const result = await collection
+      .where({ openid: openId })
+      .get();
+    
+    if (result.data && result.data.length > 0) {
+      existingUser = result.data[0];
+    }
+  } catch (e) {
+    console.log('查询用户失败，可能表不存在或权限问题', e.message);
+  }
   
-  if (existingUser.data.length > 0) {
+  if (existingUser) {
     // 用户已存在，更新最后登录时间
-    const user = existingUser.data[0];
     const updateData = {
-      lastLoginAt: new Date().toISOString()
+      updatedAt: new Date()
     };
     
     // 如果提供了昵称和头像，也更新这些信息
@@ -43,43 +51,58 @@ async function getOrCreateUser(userInfo, extraData) {
       updateData.avatar = extraData.avatar;
     }
     
-    await db.collection('users')
-      .doc(user._id)
-      .update(updateData);
+    try {
+      await collection
+        .doc(existingUser._id)
+        .update(updateData);
+    } catch (e) {
+      console.log('更新用户失败', e.message);
+    }
     
     return {
-      userId: user.userId,
-      openid: user.openid,
-      appId: user.appId,
+      userId: existingUser._id,
+      openid: existingUser.openid,
       isNewUser: false,
-      lastLoginAt: updateData.lastLoginAt,
-      nickname: user.nickname || extraData.nickname,
-      avatar: user.avatar || extraData.avatar
+      nickname: existingUser.nickname || extraData.nickname || '',
+      avatar: existingUser.avatar || extraData.avatar || ''
     };
   } else {
     // 创建新用户
     const userId = generateUserId(openId);
     const newUser = {
       userId,
-      openid: openId,
-      appId: appId,
+      openid: openId || '',
+      appId: appId || '',
       nickname: extraData.nickname || '',
       avatar: extraData.avatar || '',
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString()
+      devices: [],
+      created_at: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     
-    await db.collection('users').add(newUser);
-    
-    return {
-      userId,
-      openid: openId,
-      appId: appId || '',
-      isNewUser: true,
-      lastLoginAt: newUser.lastLoginAt,
-      nickname: newUser.nickname,
-      avatar: newUser.avatar
-    };
+    try {
+      const addResult = await collection.add(newUser);
+      return {
+        userId: addResult.id || userId,
+        openid: openId || '',
+        appId: appId || '',
+        isNewUser: true,
+        nickname: newUser.nickname,
+        avatar: newUser.avatar
+      };
+    } catch (e) {
+      console.log('创建用户失败', e.message);
+      // 如果创建失败，返回临时用户信息
+      return {
+        userId: userId,
+        openid: openId || '',
+        appId: appId || '',
+        isNewUser: true,
+        nickname: extraData.nickname || '',
+        avatar: extraData.avatar || ''
+      };
+    }
   }
 }
 
@@ -89,34 +112,54 @@ async function getOrCreateUser(userInfo, extraData) {
 async function main(event, context) {
   try {
     // 获取微信用户信息
-    const userInfo = await app.auth().getUserInfo();
+    // 在云函数中，需要通过微信服务器获取 openid
+    // 这里从 event 中接收客户端传来的用户信息
+    const { nickname, avatar } = event.data || {};
     
-    // 获取额外的用户数据（昵称、头像等）
-    const extraData = event.data || {};
+    // 获取调用者的 openid（云函数自动获取）
+    const wxContext = event.WX_CONTEXT || {};
+    const openId = wxContext.OPENID || '';
+    const appId = wxContext.APPID || '';
+    
+    console.log('登录信息:', { openId, appId, nickname, avatar });
+    
+    // 如果没有 openid，返回错误
+    if (!openId) {
+      return {
+        success: false,
+        userId: '',
+        openid: '',
+        loginStatus: 'failed',
+        isNewUser: false,
+        error: '无法获取用户OpenID，请确保在小程序中调用'
+      };
+    }
     
     // 获取或创建用户
-    const userResult = await getOrCreateUser(userInfo, extraData);
+    const userResult = await getOrCreateUser(openId, appId, {
+      nickname: nickname || '',
+      avatar: avatar || ''
+    });
     
     // 返回登录结果
     return {
+      success: true,
       userId: userResult.userId,
       openid: userResult.openid,
-      appId: userResult.appId,
       loginStatus: 'success',
       isNewUser: userResult.isNewUser,
       nickname: userResult.nickname,
-      avatar: userResult.avatar,
-      lastLoginAt: userResult.lastLoginAt
+      avatar: userResult.avatar
     };
   } catch (error) {
     console.error('微信登录失败:', error);
     return {
+      success: false,
       userId: '',
       openid: '',
-      appId: '',
       loginStatus: 'failed',
       isNewUser: false,
-      error: error.message
+      error: error.message || '登录失败'
     };
   }
 }

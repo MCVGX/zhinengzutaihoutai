@@ -34,34 +34,56 @@ export default function APIDocs({
     }],
     response: {
       success: {
+        success: true,
         loginStatus: 'success',
         userId: 'user_xxx',
         openid: 'oxxx',
         isNewUser: false,
         nickname: '',
-        avatar: '',
-        lastLoginAt: '2026-05-07T10:00:00Z'
+        avatar: ''
       },
       failed: {
+        success: false,
         loginStatus: 'failed',
         error: '错误信息'
       }
     },
     wechatCode: `// 微信小程序 - 登录
-wx.cloud.callFunction({
-  name: 'wechat-login',
-  data: {
-    nickname: userInfo.nickName,
-    avatar: userInfo.avatarUrl
-  },
+// 1. 先获取用户信息
+wx.getUserProfile({
+  desc: '用于完善用户资料',
   success: res => {
-    if (res.result.loginStatus === 'success') {
-      // 登录成功，保存用户信息
-      wx.setStorageSync('userInfo', res.result);
-      console.log('用户ID:', res.result.userId);
-    }
+    const userInfo = res.userInfo;
+    
+    // 2. 调用云函数登录
+    wx.cloud.callFunction({
+      name: 'wechat-login',
+      data: {
+        nickname: userInfo.nickName,
+        avatar: userInfo.avatarUrl
+      },
+      success: res => {
+        if (res.result && res.result.success) {
+          // 登录成功，保存用户信息
+          wx.setStorageSync('userInfo', res.result);
+          console.log('用户ID:', res.result.userId);
+          wx.showToast({ title: '登录成功' });
+        } else {
+          wx.showToast({ 
+            title: res.result?.error || '登录失败', 
+            icon: 'none' 
+          });
+        }
+      },
+      fail: err => {
+        console.error('登录失败', err);
+        wx.showToast({ title: '网络错误', icon: 'none' });
+      }
+    });
   },
-  fail: err => console.error('登录失败', err)
+  fail: err => {
+    console.error('获取用户信息失败', err);
+  }
 });`
   };
 
