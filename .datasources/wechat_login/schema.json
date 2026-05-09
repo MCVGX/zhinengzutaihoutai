@@ -1,0 +1,56 @@
+{
+  "name": "wechat_login",
+  "title": "微信登录用户",
+  "description": "存储微信登录用户的openid和手机号关联信息",
+  "schemas": [
+    {
+      "name": "user_id",
+      "title": "用户ID",
+      "type": "String",
+      "description": "用户唯一标识ID"
+    },
+    {
+      "name": "openid",
+      "title": "微信OpenID",
+      "type": "String",
+      "description": "微信唯一标识，用户登录时获取"
+    },
+    {
+      "name": "phone",
+      "title": "手机号",
+      "type": "String",
+      "description": "用户绑定的手机号"
+    },
+    {
+      "name": "created_at",
+      "title": "创建时间",
+      "type": "DateTime",
+      "format": "timestamp-ms",
+      "description": "记录创建时间"
+    },
+    {
+      "name": "updated_at",
+      "title": "更新时间",
+      "type": "DateTime",
+      "format": "timestamp-ms",
+      "description": "记录最后更新时间"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "openid_idx",
+      "fields": ["openid"],
+      "unique": true
+    },
+    {
+      "name": "phone_idx",
+      "fields": ["phone"],
+      "unique": false
+    },
+    {
+      "name": "user_id_idx",
+      "fields": ["user_id"],
+      "unique": true
+    }
+  ]
+}

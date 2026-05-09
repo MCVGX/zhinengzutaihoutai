@@ -1,0 +1,41 @@
+[
+  {
+    "_id": "1",
+    "user_id": "user_001",
+    "openid": "oXXXX_login_001",
+    "phone": "13800138000",
+    "createdAt": 1746230400000,
+    "updatedAt": 1746230400000,
+    "created_at": 1746230400000,
+    "updated_at": 1746230400000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "2",
+    "user_id": "user_002",
+    "openid": "oXXXX_login_002",
+    "phone": "13900139000",
+    "createdAt": 1746316800000,
+    "updatedAt": 1746316800000,
+    "created_at": 1746316800000,
+    "updated_at": 1746316800000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  },
+  {
+    "_id": "3",
+    "user_id": "user_003",
+    "openid": "oXXXX_login_003",
+    "phone": "13700137000",
+    "createdAt": 1746403200000,
+    "updatedAt": 1746403200000,
+    "created_at": 1746403200000,
+    "updated_at": 1746403200000,
+    "owner": "system",
+    "createBy": "system",
+    "updateBy": "system"
+  }
+]
